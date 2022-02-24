@@ -210,25 +210,6 @@ async def lancer(ctx, *texte):
     await random_attribution(ctx,texte,newcomp) #create channels and adds role
     
     await ctx.send("Partie créée!")
-    
-    #on regarde le timing
-    # fmt = "%Y-%m-%d %H:%M:%S %Z%z"
-    # now_utc = datetime.now(timezone('UTC'))
-    # now_cet = now_utc.astimezone(timezone('CET'))
-    # str_time=now_cet.strftime(fmt)
-    # str_time=str_time.split(' ')[1]
-    # print(str_time)
-    # str_time=str_time.split(':')
-    # time=[int(str_time[0]),int(str_time[1]),int(str_time[2])]
-
-    # duree_attente=0
-    # if TIME_NUIT[0] > time[0] or (TIME_NUIT[0] == time[0] and TIME_NUIT[1] > time[1]) or (TIME_NUIT[0] == time[0] and TIME_NUIT[1] == time[1] and TIME_NUIT[2] > time[2]):
-    #     duree_attente=(TIME_NUIT[0]-time[0])*3600+(TIME_NUIT[1]-time[1])*60+(TIME_NUIT[2]-time[2])
-    # else:
-    #     duree_attente=TIME_NUIT[0]*3600+TIME_NUIT[1]*60+TIME_NUIT[2]
-    #     duree_attente+=24*3600-time[0]*3600-time[1]*60-time[0]
-    # print(duree_attente)
-    # await asyncio.sleep(duree_attente)
 
     
     nuit.start()

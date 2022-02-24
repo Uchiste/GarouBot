@@ -9,17 +9,53 @@ from discord.enums import VoiceRegion
 from discord.ext.commands.errors import PartialEmojiConversionFailure
 
 class Role:
+    """
+    Role is representing all the different kind of possible Role
+    (virtual class)
+    Composed at least by
+        name (String) : the name of the 'Role'
+        channel (class discord.TextChannel) : channel links to the player
+        side (int) : 1 if the role is for the village, 0 if not
+    """
     def __init__(self) -> None:
         pass
 
 class Sorcière(Role):
+    """
+    Represents the Witch 'Role'
+    Composed by :
+        name (String): the name of the 'Role'
+        channel (class discord.TextChannel): channel links to the player
+        side (int): 1 if the role is for the village, -1 if not, 0 if neutral
+        heal (Boolean): True if the Witch steal has her heal potion
+        kill (Boolean): True if the Witch steal has her death potion
+    """
     def __init__(self,channel):
+        """Initializes the Witch.
+        The Witch starts with one heal and one death potions. She is with the Village
+
+        Args:
+            channel (class discord.TextChannel): channel links to the player
+        """
         self.name="Sorcière"
         self.channel=channel
         self.heal=True
         self.kill=True
         self.side=1
+        
     async def action(self,game,bot):
+        """start the turn of the Witch.
+        The Witcher has maximum 3 possibilities:
+        -Use heal potion to save the wolf's dead  [Can be done one time]
+        -Use death potion to kill someone (She chooses the Player) [Can be done one time]
+        -Do nothing
+
+        Args:
+            game (class Game): The current game party
+            bot (class Bot): The current bot
+            
+        return: Nothing
+        """
         sorciere=None
         non_sorciere=[]
         mort_soso=[]
@@ -193,32 +229,103 @@ class Sorcière(Role):
         await self.channel.send("Bonne nuit la sorcière")
     
     async def jour(self,channel_public_place,user):
+        """set the role for the day
+        The Witch can speak during the day in the public channel
+
+        Args:
+            channel_public_place (class discord.TextChannel): the public channel of the current game
+            user (class discord.User): The user concerned
+        """
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
 
 class Villageois(Role):
+    """
+    Represents the Villager 'Role'
+    Composed by :
+        name (String): the name of the 'Role'
+        channel (class discord.TextChannel): channel links to the player
+        side (int): 1 if the role is for the village, -1 if not, 0 if neutral
+    """
+    
     def __init__(self,channel):
+        """Initializes the Villager.
+        He is with the Village
+
+        Args:
+            channel (class discord.TextChannel): channel links to the player
+        """
         self.name="Villageois"
         self.channel=channel
         self.side=1
     async def jour(self,channel_public_place,user):
+        """set the role for the day
+        The Villager can speak during the day in the public channel
+
+        Args:
+            channel_public_place (class discord.TextChannel): the public channel of the current game
+            user (class discord.User): The user concerned
+        """
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
 
 class Loup(Role):
+    """
+    Represents the Wolf 'Role'
+    Composed by :
+        name (String): the name of the 'Role'
+        channel (class discord.TextChannel): channel links to the player
+        side (int): 1 if the role is for the village, -1 if not, 0 if neutral
+    """
+    
     def __init__(self,channel):
+        """Initializes the Wolf.
+        He is against the Village
+
+        Args:
+            channel (class discord.TextChannel): channel links to the player
+        """
         self.name="Loup"
         self.channel=channel
         self.side=-1
     async def jour(self,channel_public_place,user):
+        """set the role for the day
+        The Wolf can speak during the day in the public channel. But I can't speak in his specific channel
+
+        Args:
+            channel_public_place (class discord.TextChannel): the public channel of the current game
+            user (class discord.User): The user concerned
+        """
         await self.channel.set_permissions(user,read_messages=True,send_messages=False)
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
       
 class Cupidon(Role):
+    """
+    Represents the Cupidon 'Role'
+    Composed by :
+        name (String): the name of the 'Role'
+        channel (class discord.TextChannel): channel links to the player
+        side (int): 1 if the role is for the village, -1 if not, 0 if neutral
+    """
+    
     def __init__(self,channel):
+        """Initializes Cupidon.
+        He is with the Village
+
+        Args:
+            channel (class discord.TextChannel): channel links to the player
+        """
         self.name="Cupidon"
         self.channel=channel
         self.power=True
         self.side=1
     async def action(self,cupidon,game,bot):
+        """start the turn of Cupidon.
+        He chooses a couple at the begining of the game
+        Args:
+            game (class Game): The current game party
+            bot (class Bot): The current bot
+            
+        return: Nothing
+        """
         if self.power==True:
             self.power=False
             players=game.players
@@ -272,16 +379,44 @@ class Cupidon(Role):
             await channel_lover.set_permissions(couple[1].user,read_messages=True,send_messages=True)
             await channel_lover.set_permissions(couple[0].user,read_messages=True,send_messages=True)
             await channel_lover.send("Salut "+couple[1].user.mention+" et "+couple[0].user.mention+" askip vous êtes en couple ;) !")
-
     async def jour(self,channel_public_place,user):
+        """set the role for the day
+        Cupidon can speak during the day in the public channel.
+
+        Args:
+            channel_public_place (class discord.TextChannel): the public channel of the current game
+            user (class discord.User): The user concerned
+        """
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
 
 class Voyante(Role):
+    """
+    Represents the Clairvoyant 'Role'
+    Composed by :
+        name (String): the name of the 'Role'
+        channel (class discord.TextChannel): channel links to the player
+        side (int): 1 if the role is for the village, -1 if not, 0 if neutral
+    """
+    
     def __init__(self,channel):
+        """Initializes Clairvoyant.
+        He is with the Village
+
+        Args:
+            channel (class discord.TextChannel): channel links to the player
+        """
         self.name="Voyante"
         self.channel=channel
         self.side=1
     async def action(self,voyante,game,bot):
+        """start the turn of Clairvoyant.
+        She can discover the role of one Player each nigth
+        Args:
+            game (class Game): The current game party
+            bot (class Bot): The current bot
+            
+        return: Nothing
+        """
         non_voyante=[]
         players=game.players
         for player in players:
@@ -323,18 +458,44 @@ class Voyante(Role):
         mes="Tu as décidé de voir "+vision[0].user.name+ " qui est "+vision[0].role.name
 
         await self.channel.send(mes)
-
     async def jour(self,channel_public_place,user):
+        """set the role for the day
+        Cupidon can speak during the day in the public channel.
+
+        Args:
+            channel_public_place (class discord.TextChannel): the public channel of the current game
+            user (class discord.User): The user concerned
+        """
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
 
 class Chasseur(Role):
+    """
+    Represents the Hunter 'Role'
+    Composed by :
+        name (String): the name of the 'Role'
+        channel (class discord.TextChannel): channel links to the player
+        side (int): 1 if the role is for the village, -1 if not, 0 if neutral
+    """
     def __init__(self,channel):
+        """Initializes the Hunter.
+        He is with the Village
+
+        Args:
+            channel (class discord.TextChannel): channel links to the player
+        """
         self.name="Chasseur"
         self.channel=channel
         self.side=1
         self.power=True
-
     async def action(self,game,bot):
+        """start the turn of the Hunter.
+        When he dies, he can kill someone else or do nothing
+        Args:
+            game (class Game): The current game party
+            bot (class Bot): The current bot
+            
+        return: Nothing
+        """
         if self.power==True:
             self.power=False
             #je vais demander qui il veut tuer
@@ -392,15 +553,43 @@ class Chasseur(Role):
             #check cupidon
             await game.check_lover()
     async def jour(self,channel_public_place,user):
+        """set the role for the day
+        The hunter can speak during the day in the public channel.
+
+        Args:
+            channel_public_place (class discord.TextChannel): the public channel of the current game
+            user (class discord.User): The user concerned
+        """
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
 
 class Petite_fille(Role):
+    """
+    Represents the Little girl 'Role'
+    Composed by :
+        name (String): the name of the 'Role'
+        channel (class discord.TextChannel): channel links to the player
+        side (int) : 1 if the role is for the village, -1 if not, 0 if neutral
+        deja_lu (int) : the last message read from the wolf's channel
+    """
     def __init__(self,channel):
+        """Initializes the Little girl.
+        She is with the Village
+
+        Args:
+            channel (class discord.TextChannel): channel links to the player
+        """
         self.name="Petite Fille"
         self.channel=channel
         self.side=1
         self.deja_lu=0
     async def action(self,game):
+        """start the turn of the Little girl.
+        She can ask to know what the wolf are saying with the command '!ecoute'
+        Args:
+            game (class Game): The current game party
+            
+        return: Nothing
+        """
         players=game.players
         chan_loup=None
         for player in players:
@@ -422,28 +611,87 @@ class Petite_fille(Role):
             self.deja_lu=message.id
             print("ecoute fin")
             await self.channel.send("```Tu as tout entendu pour l'instant```")
-
     async def jour(self,channel_public_place,user):
+        """set the role for the day
+        The Little girl can speak during the day in the public channel.
+
+        Args:
+            channel_public_place (class discord.TextChannel): the public channel of the current game
+            user (class discord.User): The user concerned
+        """
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
 
 class Soeur(Role):
+    """
+    Represents the Sister 'Role'
+    Composed by :
+        name (String): the name of the 'Role'
+        channel (class discord.TextChannel): channel links to the player
+        side (int) : 1 if the role is for the village, -1 if not, 0 if neutral
+    """
     def __init__(self,channel):
+        """Initializes the Sister.
+        She is with the Village
+        She can speak to her Sister during the night
+
+        Args:
+            channel (class discord.TextChannel): channel links to the player
+        """
         self.name="Soeur"
         self.channel=channel
         self.side=1
     async def jour(self,channel_public_place,user):
+        """set the role for the day
+        The Sister can speak during the day in the public channel.
+        She can speak to her Sister during the night
+    
+        Args:
+            channel_public_place (class discord.TextChannel): the public channel of the current game
+            user (class discord.User): The user concerned
+        """
         await self.channel.set_permissions(user,read_messages=True,send_messages=False)
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
 
 class Salvateur(Role):
+    """
+    Represents the Salvateur'
+    Composed by :
+        name (String): the name of the 'Role'
+        channel (class discord.TextChannel): channel links to the player
+        side (int) : 1 if the role is for the village, -1 if not, 0 if neutral
+        self.previous_night (class discord.user) : last personn he protected
+    """
     def __init__(self,channel):
+        """Initializes the Salvateur.
+        He is with the Village
+        He can protect every nigth someone (can't be the same personn two following night)
+
+        Args:
+            channel (class discord.TextChannel): channel links to the player
+        """
         self.name="Salvateur"
         self.channel=channel
         self.side=1
         self.previous_night=None
     async def jour(self,channel_public_place,user):
+        """set the role for the day
+        The Salvateur can speak during the day in the public channel.
+        She can speak to her Sister during the night
+    
+        Args:
+            channel_public_place (class discord.TextChannel): the public channel of the current game
+            user (class discord.User): The user concerned
+        """
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
     async def action(self,game,bot):
+        """start the turn of the Salvateur.
+        Choose someone to protect.
+        
+        Args:
+            game (class Game): The current game party
+            
+        return: Nothing
+        """
         players_alive=[]
         salvateur=None
         players=game.players
@@ -503,11 +751,33 @@ class Salvateur(Role):
 
 
 class Lover():
+    """
+    Represents a couple 
+    Composed by :
+        channel (class discord.TextChannel): channel links to the couple
+        player1 & player2 (class discord.member) : which are the two member of the couple
+    """
     def __init__(self,player1,player2,channel):
+        """initializes the couple
+        
+        Args:
+            channel (class discord.TextChannel): channel links to the couple
+            player1 & player2 (class discord.member) : which are the two member of the couple
+        return: Nothing
+        """
         self.player1=player1
         self.player2=player2
         self.channel=channel
     async def check_death(self,channel_public_place,channel_graveyard,channel_recap,vivant,mort):
+        """This function check if one member of the couple is dead or not. If he is, the other member die too.
+
+        Args:
+            channel_public_place
+            channel_graveyard
+            channel_recap
+            vivant : discord role (living person)
+            mort : discord role (dead person)
+        """
         if not(self.player1.is_alive()) and self.player2.is_alive():
             await channel_public_place.send(self.player2.user.mention+" était amoureux de "+self.player1.user.mention)
             await channel_recap.send(self.player2.user.mention+" était amoureux de "+self.player1.user.mention)
@@ -517,25 +787,54 @@ class Lover():
             await channel_recap.send(self.player1.user.mention+" était amoureux de "+self.player2.user.mention)
             await self.player1.kill(channel_public_place,channel_graveyard,channel_recap,vivant,mort)
     async def nuit(self):
+        """set the couple for the night
+        The couple can speak during the night in their own channel
+        """
         if self.player1.is_alive() and self.player2.is_alive():
             await self.channel.set_permissions(self.player1.user,read_messages=True, send_messages=True)
             await self.channel.set_permissions(self.player2.user,read_messages=True, send_messages=True)
     async def jour(self):
+        """set the couple for the night
+        The couple can speak during the night in their own channel
+        """
         await self.channel.set_permissions(self.player1.user,read_messages=True, send_messages=False)
         await self.channel.set_permissions(self.player2.user,read_messages=True, send_messages=False)
 
 
         
 class Joueur:
+    """represents a Player
+    """
     def __init__(self,user,role):
+        """sets the class with is role and the discord user
+        The player start alive.
+
+        Args:
+            user
+            role
+        """
         self.alive=True
         self.user=user
         self.role=role
 
     def is_alive(self):
+        """_summary_
+
+        Returns:
+            Bool : True if the player is alive / False if the player is dead
+        """
         return self.alive
 
     async def kill(self,channel_public_place,channel_graveyard,channel_recap,vivant,mort):
+        """Kill the player and uptodate his rigths
+
+        Args:
+            channel_public_place
+            channel_graveyard
+            channel_recap
+            vivant : discord role 
+            mort : discord role
+        """
         self.alive=False
         await channel_public_place.set_permissions(self.user, read_messages=True, send_messages=False)
         await self.role.channel.set_permissions(self.user, read_messages=True, send_messages=False)
@@ -547,12 +846,19 @@ class Joueur:
         await member.add_roles(mort,reason=None)
 
     async def nuit(self,channel_public_place):
+        """starts the nigth for the player
+
+        Args:
+            channel_public_place
+        """
         if self.alive==True:
             await self.role.channel.set_permissions(self.user,read_messages=True,send_messages=True)
             await channel_public_place.set_permissions(self.user,read_messages=True,send_messages=False)
 
 
 class Game:
+    """represents a Game
+    """
     def __init__(self):
         self.started=False
         self.category=None
@@ -567,6 +873,18 @@ class Game:
         self.day=0
 
     def initialize(self,category,public_place,graveyard,polling,recap,players,vivant,mort):
+        """set all the parameters (specific to the discord's server)
+        
+        needs :
+            category: class discord.CategoryChannel
+            public_place: class discord.TextChannel
+            graveyard: class discord.TextChannel
+            polling: class discord.TextChannel
+            recap: class discord.TextChannel
+            players: list of players
+            vivant: class discord.Role
+            mort: class discord.Role
+        """
         self.category=category
         self.channel_public_place=public_place
         self.channel_graveyard=graveyard
@@ -577,10 +895,16 @@ class Game:
         self.mort=mort
     
     def is_started(self):
+        """returns 'true' if the game is already started / 'false' if not
+        """
         return(self.started)
     def start(self):
+        """set started paramaters to true (the game is started)
+        """
         self.started=True
     def finish(self):
+        """uses at the end of the game
+        """
         print("PARTIE FINI")
         self.started=False
         self.channel_public_place=None
@@ -592,8 +916,12 @@ class Game:
         self.with_mayor=True
         self.mayor=None
     def def_lover(self,lover):
+        """set the couple
+        """
         self.lover=lover
     async def check_lover(self):
+        """checks if one member of the couple is dead or not
+        """
         if self.lover!=None:
             await self.lover.check_death(self.channel_public_place,self.channel_graveyard,self.channel_recap,self.vivant,self.mort)
     
@@ -601,6 +929,11 @@ class Game:
         self.with_mayor=False
 
     async def define_mayor(self,bot):
+        """does the election of the mayor
+
+        Args:
+            bot:  class discord.ClientUser
+        """
         if self.mayor == None and self.with_mayor==True:
             players_alive=[]
             users_alive=[]
@@ -658,6 +991,12 @@ class Game:
             self.mayor=maire
 
     async def check_mayor(self,bot):
+        """checks if the mayor is dead or not.
+        If the mayor is dead, he will choose the next mayor. If he doesn't choose, the choice is random.
+
+        Args:
+            bot: class discord.ClientUser
+        """
         if self.mayor!= None and self.with_mayor==True:
             if self.mayor.is_alive()==False:
                 players_alive=[]
@@ -702,6 +1041,11 @@ class Game:
                 self.mayor=maire
 
     async def vote(self,bot):
+        """does the vote to select the player which will die.
+        
+        Args:
+            bot: class discord.ClientUser
+        """
         players_alive=[]
         users_alive=[]
         for player in self.players:
@@ -768,6 +1112,8 @@ class Game:
             await self.channel_public_place.send(message)
 
     async def nuit(self):
+        """starts the nigth
+        """
         self.night_death=[]
         await self.channel_public_place.send("C'est la nuit, le village s'endort! "+self.vivant.mention)
         await self.channel_recap.send("Nuit "+str(self.day)+":")
@@ -778,6 +1124,8 @@ class Game:
             await self.lover.nuit()
     
     async def jour(self):
+        """starts the day
+        """
         await self.channel_public_place.send("C'est le jour, le village se reveille! "+self.vivant.mention)
         await self.channel_recap.send("Jour "+str(self.day)+":")
         for player in self.players:
@@ -787,6 +1135,11 @@ class Game:
             await self.lover.jour()
     
     async def loups(self,bot):
+        """starts the round of the wolf(s)
+
+        Args:
+            bot: _description_
+        """
         players=self.players
         loups=[]
         non_loups=[]
@@ -858,6 +1211,11 @@ class Game:
             self.night_death.append(mort_loup)
 
     async def check_end(self):
+        """return true if the game is ended, false if not
+
+        Returns:
+            bool
+        """
         gentil=0
         mechant=0
         players_alive=[]
