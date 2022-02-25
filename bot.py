@@ -21,6 +21,10 @@ intents.members = True
 #pdoc3 --html chemindufichier.py
 bot = commands.Bot(command_prefix='!', description= "Salut ! Je suis GarouBOT, j'ai pour but de créer et gérer une game de Loup Garou !", intents=intents)
 
+ftoken=open("../GarouBot_TOKEN")
+TOKEN=ftoken.read()
+ftoken.close()
+
 MDJ=868458024409395211
 VIVANT=878942320744099840
 MORT=878942456849244170
@@ -361,4 +365,4 @@ async def kill(ctx,*texte):
         
 
 
-bot.run("ODY4MTIwNTMyOTgwMjExNzYz.YPrCPw.Y2u5is8586eABTNaToskdNRbNNY")
+bot.run(TOKEN)
