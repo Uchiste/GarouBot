@@ -16,4 +16,8 @@ To stop and/or clean a game, a MDJ can use the command:
 
 The bot is now cross serveur, that means you can start a game on a serveur, and an other one on an other serveur.
 
+you can use :
+    pdoc3 --html chemindufichier.py
+to generate a html documentation
+
 Version 2.0

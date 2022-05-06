@@ -11,8 +11,6 @@ import datetime
 intents = discord.Intents.default()
 intents.members = True
 
-#pdoc3 --html chemindufichier.py
-
 bot = commands.Bot(command_prefix='!', description= "Salut ! Je suis GarouBOT, j'ai pour but de créer et gérer une game de Loup Garou !", intents=intents)
 
 ftoken=open("../GarouBot_TOKEN")
