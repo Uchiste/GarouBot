@@ -1,12 +1,30 @@
+"""
+    define the class Role, Sorcière, Villageois, Loup, Cupidon, Voyante, Chasseur, Petite-fille, Soeur, Salvateur, Lover, Joueur, Game
+"""
+
+
 emoji=['🍜','🐙','🙉','🦑','🐨','🐶','🐱','🐭','🐼','🐰','🦄','🐔','🍗','🤡','💃','🍖']
+
 import asyncio
 from asyncio import streams
 from asyncio import tasks
 import random as random
+from termios import TIOCM_RNG
 
 from discord import channel, player
 from discord.enums import VoiceRegion
 from discord.ext.commands.errors import PartialEmojiConversionFailure
+
+##TO (timeout) in seconde
+TO_SORCIERE=20*60
+TO_CUPIDON=20*60
+TO_SALVATEUR=20*60
+TO_VOYANTE=20*60
+TO_CHASSEUR=10*60
+TO_NEWMAYOR=60*60
+TO_FVOTE=50*60
+TO_SVOTE=10*60
+TO_WOLF=10*60
 
 class Role:
     """
@@ -30,6 +48,7 @@ class Sorcière(Role):
         heal (Boolean): True if the Witch steal has her heal potion
         kill (Boolean): True if the Witch steal has her death potion
     """
+    
     def __init__(self,channel):
         """Initializes the Witch.
         The Witch starts with one heal and one death potions. She is with the Village
@@ -63,7 +82,7 @@ class Sorcière(Role):
         for player in players:
             if player.role.name=="Sorcière":
                 sorciere=player
-            else:
+            elif player.is_alive():
                 non_sorciere.append(player)
         
         if len(game.night_death)==1 and self.heal==True and self.kill==True:
@@ -81,7 +100,7 @@ class Sorcière(Role):
                     return(True)
                 return(False)
             try:
-                await bot.wait_for("reaction_add", timeout=1*60, check=checkSosoAction)
+                await bot.wait_for("reaction_add", timeout=TO_SORCIERE, check=checkSosoAction)
                 cache_msg = await message_sorciere.channel.fetch_message(message_sorciere.id)
                 i=-1
                 for reactions in cache_msg.reactions:
@@ -113,7 +132,7 @@ class Sorcière(Role):
                     await message_sorciere.add_reaction(emoji[j])
                 await message_sorciere.add_reaction('✅')
                 try:
-                    await bot.wait_for("reaction_add", timeout=1*60, check=checkSosoAction)
+                    await bot.wait_for("reaction_add", timeout=TO_SORCIERE, check=checkSosoAction)
                 except asyncio.TimeoutError:
                     await self.channel.send("Le temps est dépassé, le choix sera aléatoire")
                     mort_soso.append(random.randint(0,len(non_sorciere)))
@@ -145,7 +164,7 @@ class Sorcière(Role):
                     return(True)
                 return(False)
             try:
-                await bot.wait_for("reaction_add", timeout=1*60, check=checkSosoAction)
+                await bot.wait_for("reaction_add", timeout=TO_SORCIERE, check=checkSosoAction)
                 cache_msg = await message_sorciere.channel.fetch_message(message_sorciere.id)
                 i=-1
                 for reactions in cache_msg.reactions:
@@ -178,7 +197,7 @@ class Sorcière(Role):
                     return(True)
                 return(False)
             try:
-                await bot.wait_for("reaction_add", timeout=1*60, check=checkSosoAction)
+                await bot.wait_for("reaction_add", timeout=TO_SORCIERE, check=checkSosoAction)
                 cache_msg = await message_sorciere.channel.fetch_message(message_sorciere.id)
                 i=-1
                 for reactions in cache_msg.reactions:
@@ -207,7 +226,7 @@ class Sorcière(Role):
                 await message_sorciere.add_reaction('✅')
                 
                 try:
-                    await bot.wait_for("reaction_add", timeout=1*60, check=checkSosoAction)
+                    await bot.wait_for("reaction_add", timeout=TO_SORCIERE, check=checkSosoAction)
                 except asyncio.TimeoutError:
                     await self.channel.send("Le temps est dépassé, le choix sera aléatoire")
                     mort_soso.append(random.randint(0,len(non_sorciere)))
@@ -246,7 +265,6 @@ class Villageois(Role):
         channel (class discord.TextChannel): channel links to the player
         side (int): 1 if the role is for the village, -1 if not, 0 if neutral
     """
-    
     def __init__(self,channel):
         """Initializes the Villager.
         He is with the Village
@@ -275,7 +293,6 @@ class Loup(Role):
         channel (class discord.TextChannel): channel links to the player
         side (int): 1 if the role is for the village, -1 if not, 0 if neutral
     """
-    
     def __init__(self,channel):
         """Initializes the Wolf.
         He is against the Village
@@ -305,7 +322,6 @@ class Cupidon(Role):
         channel (class discord.TextChannel): channel links to the player
         side (int): 1 if the role is for the village, -1 if not, 0 if neutral
     """
-    
     def __init__(self,channel):
         """Initializes Cupidon.
         He is with the Village
@@ -347,7 +363,7 @@ class Cupidon(Role):
             await message_cupidon.add_reaction('✅')
             couple=[]
             try:
-                await bot.wait_for("reaction_add", timeout=60, check=checkCupidon)
+                await bot.wait_for("reaction_add", timeout=TO_CUPIDON, check=checkCupidon)
                 cache_msg = await message_cupidon.channel.fetch_message(message_cupidon.id)
                 i=-1
                 for reactions in cache_msg.reactions:
@@ -379,6 +395,7 @@ class Cupidon(Role):
             await channel_lover.set_permissions(couple[1].user,read_messages=True,send_messages=True)
             await channel_lover.set_permissions(couple[0].user,read_messages=True,send_messages=True)
             await channel_lover.send("Salut "+couple[1].user.mention+" et "+couple[0].user.mention+" askip vous êtes en couple ;) !")
+
     async def jour(self,channel_public_place,user):
         """set the role for the day
         Cupidon can speak during the day in the public channel.
@@ -397,7 +414,6 @@ class Voyante(Role):
         channel (class discord.TextChannel): channel links to the player
         side (int): 1 if the role is for the village, -1 if not, 0 if neutral
     """
-    
     def __init__(self,channel):
         """Initializes Clairvoyant.
         He is with the Village
@@ -440,7 +456,7 @@ class Voyante(Role):
         await message_voyante.add_reaction('✅')
         vision=[]
         try:
-            await bot.wait_for("reaction_add", timeout=60, check=checkVoyante)
+            await bot.wait_for("reaction_add", timeout=TO_VOYANTE, check=checkVoyante)
         except asyncio.TimeoutError:
             await self.channel.send("Le temps est dépassé ou le choix est erroné, le choix sera donc aléatoire")
         cache_msg = await message_voyante.channel.fetch_message(message_voyante.id)
@@ -458,6 +474,7 @@ class Voyante(Role):
         mes="Tu as décidé de voir "+vision[0].user.name+ " qui est "+vision[0].role.name
 
         await self.channel.send(mes)
+
     async def jour(self,channel_public_place,user):
         """set the role for the day
         Cupidon can speak during the day in the public channel.
@@ -487,6 +504,7 @@ class Chasseur(Role):
         self.channel=channel
         self.side=1
         self.power=True
+
     async def action(self,game,bot):
         """start the turn of the Hunter.
         When he dies, he can kill someone else or do nothing
@@ -525,7 +543,7 @@ class Chasseur(Role):
                     return(True)
                 return(False)
             try:
-                await bot.wait_for("reaction_add", timeout=1*60, check=checkChasseur)
+                await bot.wait_for("reaction_add", timeout=TO_CHASSEUR, check=checkChasseur)
                 cache_msg = await message_chasseur.channel.fetch_message(message_chasseur.id)
                 i=-1
                 for reactions in cache_msg.reactions:
@@ -548,13 +566,13 @@ class Chasseur(Role):
             #je tue
             await game.channel_public_place.send("Le chasseur a décidé de tirer sur "+mort.user.mention)
             await game.channel_recap.send("Le chasseur a décidé de tirer sur "+mort.user.mention)
-            await mort.kill(game.channel_public_place,game.channel_graveyard,game.channel_recap,game.vivant,game.mort)
+            await mort.kill(game.channel_public_place,game.channel_graveyard,game.channel_recap,game.vivant_role,game.mort_role)
             await chasseur.role.channel.send("Tu as décidé de tuer "+mort.user.name)
             #check cupidon
             await game.check_lover()
     async def jour(self,channel_public_place,user):
         """set the role for the day
-        The hunter can speak during the day in the public channel.
+        Cupidon can speak during the day in the public channel.
 
         Args:
             channel_public_place (class discord.TextChannel): the public channel of the current game
@@ -582,6 +600,7 @@ class Petite_fille(Role):
         self.channel=channel
         self.side=1
         self.deja_lu=0
+        
     async def action(self,game):
         """start the turn of the Little girl.
         She can ask to know what the wolf are saying with the command '!ecoute'
@@ -611,6 +630,7 @@ class Petite_fille(Role):
             self.deja_lu=message.id
             print("ecoute fin")
             await self.channel.send("```Tu as tout entendu pour l'instant```")
+
     async def jour(self,channel_public_place,user):
         """set the role for the day
         The Little girl can speak during the day in the public channel.
@@ -640,6 +660,7 @@ class Soeur(Role):
         self.name="Soeur"
         self.channel=channel
         self.side=1
+        
     async def jour(self,channel_public_place,user):
         """set the role for the day
         The Sister can speak during the day in the public channel.
@@ -673,6 +694,7 @@ class Salvateur(Role):
         self.channel=channel
         self.side=1
         self.previous_night=None
+        
     async def jour(self,channel_public_place,user):
         """set the role for the day
         The Salvateur can speak during the day in the public channel.
@@ -683,6 +705,7 @@ class Salvateur(Role):
             user (class discord.User): The user concerned
         """
         await channel_public_place.set_permissions(user,read_messages=True,send_messages=True)
+        
     async def action(self,game,bot):
         """start the turn of the Salvateur.
         Choose someone to protect.
@@ -718,7 +741,7 @@ class Salvateur(Role):
         await message_voyante.add_reaction('✅')
         protect=[]
         try:
-            await bot.wait_for("reaction_add", timeout=60, check=checkVoyante)
+            await bot.wait_for("reaction_add", timeout=TO_SALVATEUR, check=checkVoyante)
         except asyncio.TimeoutError:
             await self.channel.send("Le temps est dépassé ou le choix est erroné, le choix sera donc aléatoire")
         cache_msg = await message_voyante.channel.fetch_message(message_voyante.id)
@@ -768,6 +791,7 @@ class Lover():
         self.player1=player1
         self.player2=player2
         self.channel=channel
+        
     async def check_death(self,channel_public_place,channel_graveyard,channel_recap,vivant,mort):
         """This function check if one member of the couple is dead or not. If he is, the other member die too.
 
@@ -786,6 +810,7 @@ class Lover():
             await channel_public_place.send(self.player1.user.mention+" était amoureux de "+self.player2.user.mention)
             await channel_recap.send(self.player1.user.mention+" était amoureux de "+self.player2.user.mention)
             await self.player1.kill(channel_public_place,channel_graveyard,channel_recap,vivant,mort)
+            
     async def nuit(self):
         """set the couple for the night
         The couple can speak during the night in their own channel
@@ -793,6 +818,7 @@ class Lover():
         if self.player1.is_alive() and self.player2.is_alive():
             await self.channel.set_permissions(self.player1.user,read_messages=True, send_messages=True)
             await self.channel.set_permissions(self.player2.user,read_messages=True, send_messages=True)
+            
     async def jour(self):
         """set the couple for the night
         The couple can speak during the night in their own channel
@@ -818,10 +844,12 @@ class Joueur:
         self.role=role
 
     def is_alive(self):
-        """_summary_
+        """sets the class with is role and the discord user
+        The player start alive.
 
-        Returns:
-            Bool : True if the player is alive / False if the player is dead
+        Args:
+            user
+            role
         """
         return self.alive
 
@@ -859,12 +887,28 @@ class Joueur:
 class Game:
     """represents a Game
     """
-    def __init__(self):
+    def __init__(self,ctx,ID):
+        self.id=ID
+        self.server_id=ctx.guild.id
         self.started=False
         self.category=None
         self.channel_public_place=None
         self.channel_graveyard=None
         self.channel_polling=None
+        self.MDJ=None
+        self.vivant_role=None
+        self.mort_role=None
+        self.spectateur=None
+        for role in ctx.guild.roles:
+            if role.name == "Vivant":
+                self.vivant_role = role
+            elif role.name == "Mort":
+                self.mort_role = role
+            elif role.name == "MDJ":
+                self.MDJ = role
+            elif role.name == "Spectateur":
+                self.spectateur = role
+        
         self.players=None
         self.night_death=[]
         self.lover=None
@@ -872,7 +916,7 @@ class Game:
         self.mayor=None
         self.day=0
 
-    def initialize(self,category,public_place,graveyard,polling,recap,players,vivant,mort):
+    def initialize(self,category,public_place,graveyard,polling,recap,players):
         """set all the parameters (specific to the discord's server)
         
         needs :
@@ -891,21 +935,21 @@ class Game:
         self.channel_polling=polling
         self.channel_recap=recap
         self.players=players
-        self.vivant=vivant
-        self.mort=mort
-    
+        
     def is_started(self):
         """returns 'true' if the game is already started / 'false' if not
         """
         return(self.started)
+    
     def start(self):
         """set started paramaters to true (the game is started)
         """
         self.started=True
+        
     def finish(self):
         """uses at the end of the game
         """
-        print("PARTIE FINI")
+        print("PARTIE FINI id ",self.id)
         self.started=False
         self.channel_public_place=None
         self.channel_graveyard=None
@@ -915,17 +959,24 @@ class Game:
         self.lover=None
         self.with_mayor=True
         self.mayor=None
+        
     def def_lover(self,lover):
         """set the couple
         """
         self.lover=lover
+        
     async def check_lover(self):
         """checks if one member of the couple is dead or not
         """
         if self.lover!=None:
-            await self.lover.check_death(self.channel_public_place,self.channel_graveyard,self.channel_recap,self.vivant,self.mort)
+            await self.lover.check_death(self.channel_public_place,self.channel_graveyard,self.channel_recap,self.vivant_role,self.mort_role)
     
     def without_mayor(self):
+        """does the election of the mayor
+
+        Args:
+            bot:  class discord.ClientUser
+        """
         self.with_mayor=False
 
     async def define_mayor(self,bot):
@@ -953,7 +1004,7 @@ class Game:
             for j in range(0,i):
                 await message_place_publique.add_reaction(emoji[j])
             election=[0 for z in range(0,len(players_alive))]
-            await asyncio.sleep(60)
+            await asyncio.sleep(TO_NEWMAYOR)
             cache_msg = await self.channel_polling.fetch_message(message_place_publique.id)
             i=-1
             for reactions in cache_msg.reactions:
@@ -1019,7 +1070,7 @@ class Game:
                         return(True)
                     return(False)
                 try:
-                    await bot.wait_for("reaction_add", timeout=60, check=checkMaire)
+                    await bot.wait_for("reaction_add", timeout=TO_NEWMAYOR, check=checkMaire)
                     cache_msg = await self.channel_polling.fetch_message(message_perso.id)
                     i=-1
                     for reactions in cache_msg.reactions:
@@ -1052,8 +1103,8 @@ class Game:
             if player.is_alive():
                 players_alive.append(player)
                 users_alive.append(player.user)
-        await self.channel_public_place.send(self.vivant.mention+",vous allez voter pour la mort d'un membre du village!")
-        await self.channel_polling.send(self.vivant.mention+",vous allez voter pour la mort d'un membre du village!")
+        await self.channel_public_place.send(self.vivant_role.mention+",vous allez voter pour la mort d'un membre du village!")
+        await self.channel_polling.send(self.vivant_role.mention+",vous allez voter pour la mort d'un membre du village!")
         message=""
         for j in range(0,len(players_alive)):
             message=message+emoji[j]+users_alive[j].name+"\n"
@@ -1061,7 +1112,7 @@ class Game:
         for j in range(0,len(players_alive)):
             await message_vote.add_reaction(emoji[j])
         vote=[0 for z in range(0,len(players_alive))]
-        await asyncio.sleep(60)
+        await asyncio.sleep(TO_FVOTE)
         cache_msg = await self.channel_polling.fetch_message(message_vote.id)
         i=-1
         for reactions in cache_msg.reactions:
@@ -1083,7 +1134,7 @@ class Game:
             for j in range (0,len(im)):
                 await message_vote.add_reaction(emoji[j])
             vote=[0 for z in range(0,len(im))]
-            await asyncio.sleep(60)
+            await asyncio.sleep(TO_SVOTE)
             i=-1
             for reactions in cache_msg.reactions:
                 i=i+1
@@ -1105,7 +1156,7 @@ class Game:
             await self.channel_polling.send(message)
             await self.channel_public_place.send(message)
             im=im[0]
-            await players_alive[im].kill(self.channel_public_place,self.channel_graveyard,self.channel_recap,self.vivant,self.mort)
+            await players_alive[im].kill(self.channel_public_place,self.channel_graveyard,self.channel_recap,self.vivant_role,self.mort_role)
         else:
             message = "Il y a encore égalité, personne ne va mourir."
             await self.channel_polling.send(message)
@@ -1115,7 +1166,7 @@ class Game:
         """starts the nigth
         """
         self.night_death=[]
-        await self.channel_public_place.send("C'est la nuit, le village s'endort! "+self.vivant.mention)
+        await self.channel_public_place.send("C'est la nuit, le village s'endort! "+self.vivant_role.mention)
         await self.channel_recap.send("Nuit "+str(self.day)+":")
         self.day+=1
         for player in self.players:
@@ -1126,7 +1177,7 @@ class Game:
     async def jour(self):
         """starts the day
         """
-        await self.channel_public_place.send("C'est le jour, le village se reveille! "+self.vivant.mention)
+        await self.channel_public_place.send("C'est le jour, le village se reveille! "+self.vivant_role.mention)
         await self.channel_recap.send("Jour "+str(self.day)+":")
         for player in self.players:
             if player.is_alive():
@@ -1168,7 +1219,7 @@ class Game:
             for j in range(0,i):
                 await message_loup.add_reaction(emoji[j])
             meurtre=[0 for z in range(0,len(non_loups))]
-            await asyncio.sleep(60)
+            await asyncio.sleep(TO_WOLF)
             def is_wolf(user):
                 for w in loups:
                     if w.user==user:
