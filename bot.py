@@ -1,10 +1,8 @@
 from gameManager import *
 
 import asyncio
-from asyncio import tasks
 import discord
-from discord.utils import async_all,get
-from discord.ext import commands, tasks
+from discord.ext import commands
 import random as random
 import datetime
 

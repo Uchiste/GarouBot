@@ -6,14 +6,8 @@
 emoji=['🍜','🐙','🙉','🦑','🐨','🐶','🐱','🐭','🐼','🐰','🦄','🐔','🍗','🤡','💃','🍖']
 
 import asyncio
-from asyncio import streams
-from asyncio import tasks
 import random as random
 from termios import TIOCM_RNG
-
-from discord import channel, player
-from discord.enums import VoiceRegion
-from discord.ext.commands.errors import PartialEmojiConversionFailure
 
 ##TO (timeout) in seconde
 TO_SORCIERE=20*60
