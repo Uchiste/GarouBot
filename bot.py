@@ -13,13 +13,12 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', description= "Salut ! Je suis GarouBOT, j'ai pour but de créer et gérer une game de Loup Garou !", intents=intents)
 
-ftoken=open("../GarouBot_TOKEN")
+ftoken=open("GarouBot_TOKEN")
 TOKEN=ftoken.read()
 ftoken.close()
 
 
 ROLE_multiple=[1,3]
-GAMES = []
 
 T = 6
 
@@ -28,15 +27,6 @@ gameManager=GameManager()
 @bot.event
 async def on_ready():
     print("Ready !")
-
-async def find_GAMES(ctx):
-    for game in GAMES:
-        if game != None and game.server_id == ctx.guild.id:
-            return game
-    
-    game = Game(ctx)
-    GAMES.append(game)
-    return game
 
 async def random_attribution(ctx,players,comp,GAME):
     category = await ctx.guild.create_category_channel("Game")
@@ -99,9 +89,7 @@ async def random_attribution(ctx,players,comp,GAME):
 
 @bot.command(pass_context = True)
 async def test_lancer(ctx, *texte):
-  
-    
-    ##GAME = await find_GAMES(ctx)
+
     ##
     if (gameManager.findGame(ctx,State.RUNNING) != None):
         #Une partie est déja en cours sur ce serveur
@@ -396,7 +384,7 @@ async def clean(ctx):
 
 @bot.command(pass_context = True)
 async def ecoute(ctx):
-    GAME = await find_GAMES(ctx)
+    GAME =  gameManager.findGame(ctx)
     players=GAME.players
     for player in players:
         if player.user == ctx.author and player.role.name=="Petite Fille" and ctx.channel == player.role.channel:
